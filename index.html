@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LinkThing Admin</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0a0c12;color:#e2e8f0;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
+.topbar{background:#0d1017;border-bottom:1px solid #1a1d2e;padding:14px 28px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-size:18px;font-weight:800;background:linear-gradient(135deg,#7c3aed,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.logo span{color:#4a5568;font-size:13px;font-weight:400;margin-left:8px;-webkit-text-fill-color:#4a5568}
+.badge{background:#7c3aed22;color:#a78bfa;border:1px solid #7c3aed44;border-radius:6px;padding:3px 10px;font-size:12px}
+.main{max-width:780px;margin:32px auto;padding:0 16px}
+.card{background:#0d1017;border:1px solid #1a1d2e;border-radius:14px;padding:22px;margin-bottom:18px}
+.card-title{font-size:12px;color:#4a5568;text-transform:uppercase;letter-spacing:.8px;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.card-title::after{content:'';flex:1;height:1px;background:#1a1d2e}
+input,select{width:100%;background:#070910;border:1px solid #1a1d2e;border-radius:8px;color:#e2e8f0;padding:10px 13px;font-size:13px;outline:none;transition:border-color .15s}
+input:focus{border-color:#7c3aed}
+input[type=password]{letter-spacing:3px}
+.row{display:flex;gap:8px}
+.row input{flex:1}
+.btn{border:none;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap}
+.btn-primary{background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;box-shadow:0 4px 14px #7c3aed33}
+.btn-primary:hover{opacity:.88}
+.btn-primary:disabled{opacity:.35;cursor:not-allowed;box-shadow:none}
+.btn-ghost{background:#1a1d2e;color:#94a3b8;border:1px solid #252840}
+.btn-ghost:hover{background:#252840;color:#e2e8f0}
+.btn-sm{padding:5px 13px;font-size:12px}
+.btn-del{background:#f8717114;color:#f87171;border:1px solid #f8717130}
+.btn-del:hover{background:#f8717130}
+#toast{position:fixed;bottom:24px;right:24px;padding:11px 18px;border-radius:10px;font-size:13px;font-weight:500;z-index:999;opacity:0;transform:translateY(10px);transition:all .25s;pointer-events:none}
+#toast.show{opacity:1;transform:translateY(0)}
+#toast.ok{background:#052e1680;color:#4ade80;border:1px solid #166534}
+#toast.err{background:#450a0a80;color:#f87171;border:1px solid #991b1b}
+#toast.info{background:#1e1b4b80;color:#a78bfa;border:1px solid #4c1d95}
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{color:#4a5568;font-size:11px;text-transform:uppercase;letter-spacing:.6px;padding:8px 12px;text-align:left;border-bottom:1px solid #1a1d2e}
+.tbl td{padding:10px 12px;border-bottom:1px solid #0f1118;vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:#0f1118}
+.key-badge{background:#7c3aed22;color:#a78bfa;border:1px solid #7c3aed33;border-radius:5px;padding:2px 9px;font-family:monospace;font-size:12px}
+.domain-text{color:#94a3b8;font-family:monospace;font-size:12px}
+.empty{text-align:center;color:#2d3148;padding:36px;font-size:13px}
+.toggle-wrap{display:flex;align-items:center;gap:10px}
+.switch{position:relative;display:inline-block;width:42px;height:24px}
+.switch input{opacity:0;width:0;height:0}
+.slider{position:absolute;inset:0;background:#1a1d2e;border-radius:24px;cursor:pointer;transition:background .2s}
+.slider::before{content:'';position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;left:3px;top:3px;transition:transform .2s}
+input:checked+.slider{background:#7c3aed}
+input:checked+.slider::before{transform:translateX(18px)}
+.token-wrap{position:relative}
+.token-wrap input{padding-right:44px}
+.eye-btn{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:#4a5568;cursor:pointer;font-size:16px;padding:2px}
+.eye-btn:hover{color:#94a3b8}
+.stat-row{display:flex;gap:12px;margin-bottom:18px}
+.stat{flex:1;background:#0d1017;border:1px solid #1a1d2e;border-radius:10px;padding:14px 16px}
+.stat-val{font-size:26px;font-weight:700;color:#a78bfa}
+.stat-lbl{font-size:11px;color:#4a5568;margin-top:2px}
+.sep{height:1px;background:#1a1d2e;margin:14px 0}
+#cfg-section{display:none}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div>
+    <span class="logo">LinkThing <span>Admin</span></span>
+  </div>
+  <span class="badge" id="status-badge">Chưa kết nối</span>
+</div>
+
+<div class="main">
+
+  <!-- CONFIG -->
+  <div class="card">
+    <div class="card-title">⚙ Cấu hình GitHub</div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <input id="inp-owner" placeholder="GitHub username  (VD: NobIsRed)" />
+      <input id="inp-repo"  placeholder="Tên repo  (VD: LinkThing)" />
+      <input id="inp-file"  placeholder="Đường dẫn file JSON  (VD: link.json)" value="link.json" />
+      <div class="token-wrap">
+        <input id="inp-token" type="password" placeholder="GitHub Personal Access Token (repo scope)" />
+        <button class="eye-btn" onclick="toggleEye()">👁</button>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-primary" onclick="connect()" id="btn-connect">Kết nối</button>
+        <button class="btn btn-ghost" onclick="clearCfg()">Xoá</button>
+      </div>
+      <div style="font-size:11px;color:#2d3148">Token chỉ lưu trong localStorage trình duyệt này, không gửi đi đâu khác.</div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div id="cfg-section">
+    <div class="stat-row">
+      <div class="stat"><div class="stat-val" id="stat-count">0</div><div class="stat-lbl">Redirects</div></div>
+      <div class="stat"><div class="stat-val" id="stat-enabled" style="font-size:16px;padding-top:5px">—</div><div class="stat-lbl">Trạng thái</div></div>
+    </div>
+
+    <!-- TOGGLE ENABLED -->
+    <div class="card">
+      <div class="card-title">🔁 Redirect toàn cục</div>
+      <div class="toggle-wrap">
+        <label class="switch"><input type="checkbox" id="chk-enabled" onchange="toggleEnabled()"><span class="slider"></span></label>
+        <span id="lbl-enabled" style="font-size:13px;color:#94a3b8">—</span>
+        <button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="loadData()">↻ Tải lại</button>
+      </div>
+    </div>
+
+    <!-- ADD -->
+    <div class="card">
+      <div class="card-title">➕ Thêm redirect</div>
+      <div class="row" style="margin-bottom:10px">
+        <input id="inp-key"    placeholder="key  (VD: yt, fb, drive…)" style="max-width:180px" />
+        <input id="inp-domain" placeholder="domain  (VD: youtube.com)" />
+      </div>
+      <button class="btn btn-primary" onclick="addRedirect()" id="btn-add">Thêm</button>
+    </div>
+
+    <!-- LIST -->
+    <div class="card">
+      <div class="card-title">📋 Danh sách redirect</div>
+      <div id="tbl-wrap"><div class="empty">Đang tải…</div></div>
+    </div>
+  </div>
+
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ── Storage keys
+const SK = { owner:'lt_owner', repo:'lt_repo', file:'lt_file', token:'lt_token' };
+
+// ── Load saved config
+window.onload = () => {
+  document.getElementById('inp-owner').value = localStorage.getItem(SK.owner) || '';
+  document.getElementById('inp-repo').value  = localStorage.getItem(SK.repo)  || '';
+  document.getElementById('inp-file').value  = localStorage.getItem(SK.file)  || 'link.json';
+  document.getElementById('inp-token').value = localStorage.getItem(SK.token) || '';
+  if (localStorage.getItem(SK.token)) connect();
+};
+
+let fileSHA = null;
+let currentData = { enabled: true, redirects: {} };
+
+function cfg() {
+  return {
+    owner : document.getElementById('inp-owner').value.trim(),
+    repo  : document.getElementById('inp-repo').value.trim(),
+    file  : document.getElementById('inp-file').value.trim() || 'link.json',
+    token : document.getElementById('inp-token').value.trim(),
+  };
+}
+
+function apiURL(c) {
+  return `https://api.github.com/repos/${c.owner}/${c.repo}/contents/${c.file}`;
+}
+
+function headers(c) {
+  return {
+    'Authorization': `Bearer ${c.token}`,
+    'Accept': 'application/vnd.github+json',
+    'X-GitHub-Api-Version': '2022-11-28',
+    'Content-Type': 'application/json',
+  };
+}
+
+function toast(msg, type='info') {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className = 'show ' + type;
+  clearTimeout(el._t);
+  el._t = setTimeout(() => { el.className = ''; }, 3000);
+}
+
+function toggleEye() {
+  const inp = document.getElementById('inp-token');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+async function connect() {
+  const c = cfg();
+  if (!c.owner || !c.repo || !c.token) { toast('Nhập đủ thông tin!', 'err'); return; }
+  localStorage.setItem(SK.owner, c.owner);
+  localStorage.setItem(SK.repo,  c.repo);
+  localStorage.setItem(SK.file,  c.file);
+  localStorage.setItem(SK.token, c.token);
+  document.getElementById('btn-connect').disabled = true;
+  document.getElementById('status-badge').textContent = 'Đang kết nối…';
+  await loadData();
+  document.getElementById('btn-connect').disabled = false;
+}
+
+function clearCfg() {
+  Object.values(SK).forEach(k => localStorage.removeItem(k));
+  ['inp-owner','inp-repo','inp-file','inp-token'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('cfg-section').style.display = 'none';
+  document.getElementById('status-badge').textContent = 'Chưa kết nối';
+  toast('Đã xoá cấu hình', 'info');
+}
+
+async function loadData() {
+  const c = cfg();
+  try {
+    const res = await fetch(apiURL(c), { headers: headers(c) });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const json = await res.json();
+    fileSHA = json.sha;
+    currentData = JSON.parse(atob(json.content.replace(/\n/g,'')));
+    renderAll();
+    document.getElementById('cfg-section').style.display = 'block';
+    document.getElementById('status-badge').textContent = '✓ Đã kết nối';
+    document.getElementById('status-badge').style.background = '#05361680';
+    document.getElementById('status-badge').style.color = '#4ade80';
+    document.getElementById('status-badge').style.borderColor = '#166534';
+    toast('Tải thành công!', 'ok');
+  } catch(e) {
+    toast('Lỗi: ' + e.message, 'err');
+    document.getElementById('status-badge').textContent = 'Lỗi kết nối';
+  }
+}
+
+function renderAll() {
+  // stats
+  const redirects = currentData.redirects || {};
+  document.getElementById('stat-count').textContent = Object.keys(redirects).length;
+  const en = currentData.enabled !== false;
+  document.getElementById('stat-enabled').textContent = en ? '🟢 BẬT' : '🔴 TẮT';
+  document.getElementById('chk-enabled').checked = en;
+  document.getElementById('lbl-enabled').textContent = en ? 'Redirect đang BẬT' : 'Redirect đang TẮT';
+
+  // table
+  const wrap = document.getElementById('tbl-wrap');
+  const entries = Object.entries(redirects);
+  if (entries.length === 0) {
+    wrap.innerHTML = '<div class="empty">Chưa có redirect nào. Thêm ở trên!</div>';
+    return;
+  }
+  wrap.innerHTML = `
+    <table class="tbl">
+      <thead><tr>
+        <th>Key</th><th>Domain</th><th style="width:100px"></th>
+      </tr></thead>
+      <tbody>
+        ${entries.map(([k,v]) => `
+          <tr>
+            <td><span class="key-badge">${esc(k)}</span></td>
+            <td><span class="domain-text">${esc(v)}</span></td>
+            <td style="text-align:right">
+              <button class="btn btn-del btn-sm" onclick="deleteRedirect('${esc(k)}')">🗑 Xoá</button>
+            </td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>`;
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+async function save(msg) {
+  const c = cfg();
+  const content = btoa(unescape(encodeURIComponent(
+    JSON.stringify(currentData, null, 2)
+  )));
+  const body = JSON.stringify({ message: msg, content, sha: fileSHA });
+  const res = await fetch(apiURL(c), { method:'PUT', headers: headers(c), body });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.message || `HTTP ${res.status}`);
+  }
+  const json = await res.json();
+  fileSHA = json.content.sha;
+}
+
+async function addRedirect() {
+  const key    = document.getElementById('inp-key').value.trim();
+  const domain = document.getElementById('inp-domain').value.trim();
+  if (!key || !domain) { toast('Nhập đủ key và domain!', 'err'); return; }
+  const btn = document.getElementById('btn-add');
+  btn.disabled = true; btn.textContent = 'Đang lưu…';
+  try {
+    if (!currentData.redirects) currentData.redirects = {};
+    currentData.redirects[key] = domain;
+    await save(`Add redirect: ${key} → ${domain}`);
+    document.getElementById('inp-key').value = '';
+    document.getElementById('inp-domain').value = '';
+    renderAll();
+    toast(`✓ Đã thêm: ${key} → ${domain}`, 'ok');
+  } catch(e) {
+    delete currentData.redirects[key];
+    toast('Lỗi: ' + e.message, 'err');
+  }
+  btn.disabled = false; btn.textContent = 'Thêm';
+}
+
+async function deleteRedirect(key) {
+  if (!confirm(`Xoá redirect "${key}"?`)) return;
+  const old = currentData.redirects[key];
+  try {
+    delete currentData.redirects[key];
+    await save(`Delete redirect: ${key}`);
+    renderAll();
+    toast(`✓ Đã xoá: ${key}`, 'ok');
+  } catch(e) {
+    currentData.redirects[key] = old;
+    toast('Lỗi: ' + e.message, 'err');
+  }
+}
+
+async function toggleEnabled() {
+  const val = document.getElementById('chk-enabled').checked;
+  const old = currentData.enabled;
+  try {
+    currentData.enabled = val;
+    await save(`Set enabled: ${val}`);
+    renderAll();
+    toast(`Redirect ${val ? 'BẬT' : 'TẮT'}`, 'ok');
+  } catch(e) {
+    currentData.enabled = old;
+    document.getElementById('chk-enabled').checked = old;
+    toast('Lỗi: ' + e.message, 'err');
+  }
+}
+
+// Enter to add
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.activeElement.id === 'inp-domain') addRedirect();
+  if (e.key === 'Enter' && document.activeElement.id === 'inp-domain' === false
+    && document.activeElement.id === 'inp-key') document.getElementById('inp-domain').focus();
+});
+</script>
+</body>
+</html>
