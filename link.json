@@ -1,4 +1,6 @@
 {
   "enabled": true,
-  "redirects": {}
+  "redirects": {
+    "201-2": "mb66i2.ink"
+  }
 }
