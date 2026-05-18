@@ -3,9 +3,9 @@
 // @namespace    https://nekovcheat.io/
 // @version      2.0
 // @description  Bypass UptoLink — host trên nekovcheat.io
-// @require      https://nekovcheat.io/source.js
+// @require      https://github.com/NobIsRed/LinkThing/blob/main/source.js
 // @match        *://*/*
-// @author       NekoVCheat
+// @author       LinkThing
 // @grant        GM_xmlhttpRequest
 // @connect      uptolink.one
 // @connect      nekovcheat.io
