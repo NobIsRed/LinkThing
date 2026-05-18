@@ -1,14 +1,14 @@
 // ==UserScript==
 // @name         Bypass UptoLink (NekoVCheat)
-// @namespace    https://github.com/NobIsRed/LinkThing
+// @namespace    https://nekovcheat.io/
 // @version      2.0
 // @description  Bypass UptoLink — host trên nekovcheat.io
-// @require      https://raw.githubusercontent.com/NobIsRed/LinkThing/main/source.js
+// @require      https://nekovcheat.io/source.js
 // @match        *://*/*
 // @author       NekoVCheat
 // @grant        GM_xmlhttpRequest
 // @connect      uptolink.one
-// @connect      raw.githubusercontent.com
+// @connect      nekovcheat.io
 // @connect      api.kolosal.ai
 // @connect      *
 // @run-at       document-end

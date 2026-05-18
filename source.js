@@ -1,10 +1,10 @@
 (function () {
   'use strict';
 
-  // ====== Cấu hình LinkThing ======
+  // ====== Cấu hình NekoVCheat ======
   // Đổi nếu bạn host ở subpath khác. Đường dẫn này phải khớp với
   // vị trí các file api.php và link.json trên hosting.
-  const API_BASE = 'https://raw.githubusercontent.com/NobIsRed/LinkThing/main';
+  const API_BASE = 'https://nekovcheat.io';
   const CONFIG_URL = API_BASE + '/link.json';
   const SAVE_URL = API_BASE + '/api.php?action=save';
 
@@ -77,7 +77,7 @@
   let oTieuDe = document.createElement('div');
   oTieuDe.className = 'lux-header';
   oTieuDe.innerHTML =
-    '\n        <span><span style="color:#b0bec5;">✦</span> LINKTHING BYPASS</span>\n        <div style="display:flex; align-items:center;">\n            <span style="color: #888; font-size: 11px; margin-right: 5px;">github.com/NobIsRed/LinkThing</span>\n            <button id="lux-toggle-btn" class="lux-btn" title="Thu nhỏ / Phóng to">_</button>\n        </div>\n    ';
+    '\n        <span><span style="color:#b0bec5;">✦</span> NEKOVCHEAT BYPASS</span>\n        <div style="display:flex; align-items:center;">\n            <span style="color: #888; font-size: 11px; margin-right: 5px;">nekovcheat.io</span>\n            <button id="lux-toggle-btn" class="lux-btn" title="Thu nhỏ / Phóng to">_</button>\n        </div>\n    ';
   oPanel.appendChild(oTieuDe);
   let oNoiDung = document.createElement('div');
   oNoiDung.className = 'lux-body';
@@ -290,7 +290,7 @@
     });
   }
   function layCacheRedirect(khoaCache) {
-    ghiLog('Đang kết nối với cơ sở dữ liệu LinkThing...', 'system');
+    ghiLog('Đang kết nối với cơ sở dữ liệu nekovcheat.io...', 'system');
     GM_xmlhttpRequest({
       method: 'GET',
       url: `${CONFIG_URL}?t=${new Date().getTime()}`,
@@ -312,7 +312,7 @@
         }
       },
       onerror: function () {
-        ghiLog('Lỗi kết nối LinkThing. Kích hoạt nhận diện AI...', 'error');
+        ghiLog('Lỗi kết nối nekovcheat.io. Kích hoạt nhận diện AI...', 'error');
         batDauPipelineOCR();
       },
     });
@@ -504,7 +504,7 @@
     });
   }
   function dongBoLenServer(khoaDongBo, tenMienDongBo) {
-    ghiLog('Đang đồng bộ hóa dữ liệu lên LinkThing...', 'system');
+    ghiLog('Đang đồng bộ hóa dữ liệu lên nekovcheat.io...', 'system');
     GM_xmlhttpRequest({
       method: 'POST',
       url: SAVE_URL,
@@ -523,7 +523,7 @@
         }
       },
       onerror: function () {
-        ghiLog('Không gọi được API LinkThing.', 'error');
+        ghiLog('Không gọi được api.php trên nekovcheat.io.', 'error');
       },
     });
   }
